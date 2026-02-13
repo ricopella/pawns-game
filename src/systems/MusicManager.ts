@@ -68,15 +68,15 @@ function loadYouTubeAPI(): void {
 	}
 
 	window.onYouTubeIframeAPIReady = () => {
-		// Olivia Dean - "Dive" (romantic, perfect for Valentine's)
+		// Olivia Dean
 		ytPlayer = new window.YT.Player("yt-music-player", {
 			height: "1",
 			width: "1",
-			videoId: "mWRsgZuwf_8", // Olivia Dean - Dive
+			videoId: "oIv_Y2RPQ_A", // Olivia Dean
 			playerVars: {
 				autoplay: 0,
 				loop: 1,
-				playlist: "mWRsgZuwf_8", // Required for loop to work
+				playlist: "oIv_Y2RPQ_A", // Required for loop to work
 				controls: 0,
 				disablekb: 1,
 				fs: 0,
