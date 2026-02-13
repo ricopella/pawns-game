@@ -307,8 +307,8 @@ export class DrivingScene extends Phaser.Scene {
 		// Update obstacles
 		this.updateObstacles(delta);
 
-		// Check collisions
-		if (!this.invincible) {
+		// Check collisions (not while stopped at a light)
+		if (!this.invincible && !this.waitingAtLight) {
 			this.checkCollisions();
 		}
 	}
@@ -373,6 +373,15 @@ export class DrivingScene extends Phaser.Scene {
 		this.stopped = true;
 		this.scrollSpeed = 0;
 
+		// Clear any obstacles on screen so they don't hit the player at the light
+		for (const obs of this.obstaclePool) {
+			if (obs.active) {
+				obs.active = false;
+				obs.sprite.setActive(false);
+				obs.sprite.setVisible(false);
+			}
+		}
+
 		// Show red traffic light
 		this.trafficLight = this.add.sprite(600, 200, "trafficLightRed").setScale(5);
 		this.trafficLight.setDepth(50);
@@ -386,6 +395,7 @@ export class DrivingScene extends Phaser.Scene {
 				}
 				this.dialogueBox.show(DIALOGUES.driving.greenLight, () => {
 					this.stopped = false;
+					this.waitingAtLight = false;
 					this.scrollSpeed = DRIVING.INITIAL_SCROLL_SPEED;
 					if (this.trafficLight) {
 						this.tweens.add({
