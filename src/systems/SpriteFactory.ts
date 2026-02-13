@@ -44,6 +44,15 @@ const COLORS = {
 	roadGray: 0x555555,
 	roadLine: 0xffff00,
 	grassGreen: 0x5ca04a,
+	concrete: 0x999999,
+	concreteDark: 0x777777,
+	concreteLight: 0xbbbbbb,
+	teal: 0x00a896,
+	awningOrange: 0xe87d2f,
+	awningRed: 0xc0392b,
+	neonPink: 0xff1493,
+	neonBlue: 0x00d4ff,
+	skyBlue: 0x87ceeb,
 
 	// Valentine's
 	heartRed: 0xff1744,
@@ -624,6 +633,84 @@ function drawBuilding(g: Phaser.GameObjects.Graphics): void {
 	drawPixel(g, 38, 3, COLORS.blue);
 }
 
+// Tuk-tuk (iconic Bangkok vehicle)
+function drawTukTuk(g: Phaser.GameObjects.Graphics): void {
+	// Canopy (blue/teal top)
+	for (let x = 1; x <= 7; x++) drawPixel(g, x, 0, COLORS.teal);
+	for (let x = 0; x <= 8; x++) drawPixel(g, x, 1, COLORS.teal);
+	for (let x = 0; x <= 8; x++) drawPixel(g, x, 2, COLORS.teal);
+	// Body (yellow/gold)
+	for (let x = 1; x <= 7; x++) drawPixel(g, x, 3, COLORS.yellow);
+	for (let x = 1; x <= 7; x++) drawPixel(g, x, 4, COLORS.yellow);
+	for (let x = 1; x <= 7; x++) drawPixel(g, x, 5, COLORS.yellow);
+	// Open back
+	drawPixel(g, 2, 4, COLORS.black);
+	drawPixel(g, 6, 4, COLORS.black);
+	// Wheels
+	drawPixel(g, 1, 6, COLORS.black);
+	drawPixel(g, 4, 6, COLORS.black);
+	drawPixel(g, 7, 6, COLORS.black);
+	// Headlight
+	drawPixel(g, 4, 0, COLORS.yellow);
+}
+
+// Bus (Bangkok city bus, big obstacle)
+function drawBus(g: Phaser.GameObjects.Graphics): void {
+	// Main body (red/orange Bangkok bus)
+	for (let y = 0; y < 36; y++) {
+		for (let x = 1; x < 17; x++) {
+			drawPixel(g, x, y, COLORS.awningRed);
+		}
+	}
+	// White stripe
+	for (let y = 14; y < 17; y++) {
+		for (let x = 1; x < 17; x++) {
+			drawPixel(g, x, y, COLORS.white);
+		}
+	}
+	// Windshield
+	for (let x = 3; x < 15; x++) {
+		for (let y = 2; y < 6; y++) {
+			drawPixel(g, x, y, COLORS.blueDark);
+		}
+	}
+	// Windows along sides
+	for (let y = 7; y < 10; y++) {
+		for (let x = 3; x < 7; x++) drawPixel(g, x, y, COLORS.blueDark);
+		for (let x = 9; x < 13; x++) drawPixel(g, x, y, COLORS.blueDark);
+	}
+	// Rear window
+	for (let x = 3; x < 15; x++) {
+		for (let y = 28; y < 32; y++) {
+			drawPixel(g, x, y, COLORS.blueDark);
+		}
+	}
+	// Wheels
+	for (let y = 5; y < 9; y++) {
+		drawPixel(g, 0, y, COLORS.black);
+		drawPixel(g, 17, y, COLORS.black);
+	}
+	for (let y = 26; y < 30; y++) {
+		drawPixel(g, 0, y, COLORS.black);
+		drawPixel(g, 17, y, COLORS.black);
+	}
+}
+
+// Office chair (top-down view)
+function drawOfficeChair(g: Phaser.GameObjects.Graphics): void {
+	// Seat (dark gray circle-ish)
+	for (let x = 1; x <= 5; x++) drawPixel(g, x, 1, COLORS.grayDark);
+	for (let x = 0; x <= 6; x++) drawPixel(g, x, 2, COLORS.grayDark);
+	for (let x = 0; x <= 6; x++) drawPixel(g, x, 3, COLORS.grayDark);
+	for (let x = 1; x <= 5; x++) drawPixel(g, x, 4, COLORS.grayDark);
+	// Backrest
+	for (let x = 1; x <= 5; x++) drawPixel(g, x, 0, COLORS.black);
+	// Wheels (5 points)
+	drawPixel(g, 0, 5, COLORS.gray);
+	drawPixel(g, 3, 5, COLORS.gray);
+	drawPixel(g, 6, 5, COLORS.gray);
+}
+
 function generateTexture(
 	scene: Phaser.Scene,
 	key: string,
@@ -655,6 +742,11 @@ export function generateAllTextures(scene: Phaser.Scene): void {
 	generateTexture(scene, "playerCar", 24, 32, drawCarTopDown);
 	generateTexture(scene, "obstacleCar", 22, 28, drawObstacleCar);
 	generateTexture(scene, "motorbike", 9, 9, drawMotorbike);
+	generateTexture(scene, "tukTuk", 9, 7, drawTukTuk);
+	generateTexture(scene, "bus", 18, 36, drawBus);
+
+	// Office furniture
+	generateTexture(scene, "officeChair", 7, 6, drawOfficeChair);
 
 	// UI
 	generateTexture(scene, "heart", 7, 6, drawHeart);
@@ -731,6 +823,36 @@ export function generateAllTextures(scene: Phaser.Scene): void {
 	tileG.fillStyle(COLORS.brownDark);
 	tileG.fillRect(0, 14, 32, 2);
 	tileG.generateTexture("desk", 32, 16);
+	tileG.clear();
+
+	// Sidewalk tile (Bangkok concrete)
+	tileG.fillStyle(0xc0b8a8);
+	tileG.fillRect(0, 0, 16, 16);
+	tileG.fillStyle(0xb5ad9d);
+	tileG.fillRect(0, 8, 16, 1);
+	tileG.fillRect(8, 0, 1, 16);
+	tileG.generateTexture("sidewalkTile", 16, 16);
+	tileG.clear();
+
+	// Building side tile (for driving scene sides)
+	tileG.fillStyle(0x8a7d6b);
+	tileG.fillRect(0, 0, 16, 16);
+	tileG.fillStyle(0x7a6d5b);
+	tileG.fillRect(0, 0, 16, 1);
+	tileG.fillStyle(0x6a9cc5);
+	tileG.fillRect(3, 4, 5, 4);
+	tileG.fillRect(10, 4, 5, 4);
+	tileG.fillRect(3, 11, 5, 4);
+	tileG.generateTexture("buildingSideTile", 16, 16);
+	tileG.clear();
+
+	// Parking concrete tile
+	tileG.fillStyle(0x888888);
+	tileG.fillRect(0, 0, 16, 16);
+	tileG.fillStyle(0x808080);
+	tileG.fillRect(0, 15, 16, 1);
+	tileG.fillRect(15, 0, 1, 16);
+	tileG.generateTexture("parkingTile", 16, 16);
 	tileG.clear();
 
 	tileG.destroy();

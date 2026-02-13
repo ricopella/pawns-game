@@ -6,8 +6,8 @@ export const DIALOGUES = {
 		timeToGo: ["Alright, time to head to work!"],
 	},
 	leaveHouse: {
-		walkOut: ["Let's go, babies! Time to get in the car."],
-		getInCar: ["Everyone in! Bangkok traffic, here we come..."],
+		walkOut: ["Let's go babies! Down the stairs to the car."],
+		getInCar: ["Everyone in! Time to brave Lat Prao traffic..."],
 	},
 	driving: {
 		start: ["Here we go... rush hour in Bangkok."],
@@ -32,7 +32,7 @@ export const DIALOGUES = {
 		betweenBattles: [
 			"Mr. Senior retreated to his desk!",
 			"Phew! But wait...",
-			"The Boss appears from his office!",
+			"The Boss walks over from his pod...",
 		],
 	},
 	battle: {

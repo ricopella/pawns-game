@@ -1,6 +1,8 @@
 import Phaser from "phaser";
+import { FADE } from "../config/constants";
 import { DIALOGUES } from "../data/dialogues";
 import { DialogueBox } from "../systems/DialogueBox";
+import { createMusicToggle } from "../systems/MusicManager";
 
 export class VictoryScene extends Phaser.Scene {
 	private dialogueBox!: DialogueBox;
@@ -10,7 +12,8 @@ export class VictoryScene extends Phaser.Scene {
 	}
 
 	create(): void {
-		this.cameras.main.fadeIn(800);
+		this.cameras.main.fadeIn(FADE.SLOW);
+		createMusicToggle(this);
 
 		const width = this.cameras.main.width;
 		const height = this.cameras.main.height;
@@ -87,6 +90,12 @@ export class VictoryScene extends Phaser.Scene {
 
 		// Dialogue box
 		this.dialogueBox = new DialogueBox({ scene: this });
+
+		// Scene cleanup
+		this.events.on("shutdown", () => {
+			this.dialogueBox.destroy();
+			this.input.keyboard?.removeAllListeners();
+		});
 
 		// Show congrats dialogue, then boyfriend entrance
 		this.time.delayedCall(1500, () => {
@@ -287,7 +296,7 @@ export class VictoryScene extends Phaser.Scene {
 
 			if (this.input.keyboard) {
 				this.input.keyboard.on("keydown-SPACE", () => {
-					this.cameras.main.fadeOut(1000, 0, 0, 0);
+					this.cameras.main.fadeOut(FADE.VICTORY, 0, 0, 0);
 					this.cameras.main.once("camerafadeoutcomplete", () => {
 						this.scene.start("TitleScene");
 					});

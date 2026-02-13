@@ -1,7 +1,10 @@
 import Phaser from "phaser";
+import { DOGS, FADE, INTERACTION, PLAYER, PLAYER_BOUNDS } from "../config/constants";
 import { DIALOGUES } from "../data/dialogues";
 import { DialogueBox } from "../systems/DialogueBox";
 import { DogFollower } from "../systems/DogFollower";
+import { createMusicToggle } from "../systems/MusicManager";
+import { PlayerController } from "../systems/PlayerController";
 
 type OfficePhase =
 	| "entering"
@@ -19,9 +22,8 @@ export class OfficeArrivalScene extends Phaser.Scene {
 	private lucky!: DogFollower;
 	private cooper!: DogFollower;
 	private dialogueBox!: DialogueBox;
-	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+	private playerController!: PlayerController;
 	private phase: OfficePhase = "entering";
-	private speed = 150;
 	private ploy!: Phaser.GameObjects.Sprite;
 	private bestie!: Phaser.GameObjects.Sprite;
 	private mrSenior!: Phaser.GameObjects.Sprite;
@@ -38,7 +40,8 @@ export class OfficeArrivalScene extends Phaser.Scene {
 	}
 
 	create(data?: { phase?: string }): void {
-		this.cameras.main.fadeIn(500);
+		this.cameras.main.fadeIn(FADE.DEFAULT);
+		createMusicToggle(this);
 		this.npcsTriggered = { ploy: false, bestie: false, senior: false, boss: false };
 
 		// Draw office
@@ -54,9 +57,15 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		// Dialogue
 		this.dialogueBox = new DialogueBox({ scene: this });
 
-		if (this.input.keyboard) {
-			this.cursors = this.input.keyboard.createCursorKeys();
-		}
+		// Scene cleanup
+		this.events.on("shutdown", this.cleanup, this);
+	}
+
+	private cleanup(): void {
+		this.lucky.destroy();
+		this.cooper.destroy();
+		this.dialogueBox.destroy();
+		this.events.off("shutdown", this.cleanup, this);
 	}
 
 	private addNpcLabel(x: number, y: number, name: string, depth: number): void {
@@ -76,18 +85,21 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		this.phase = "entering";
 
 		// Pawn enters from bottom
-		this.pawn = this.add.sprite(400, 550, "pawn").setScale(4);
-		this.pawn.setDepth(10);
+		this.pawn = this.add.sprite(400, 550, "pawn").setScale(PLAYER.SCALE);
+		this.pawn.setDepth(PLAYER.DEPTH);
+
+		// Player controller
+		this.playerController = new PlayerController({
+			scene: this,
+			sprite: this.pawn,
+			bounds: PLAYER_BOUNDS.office,
+		});
 
 		// Dogs
 		this.lucky = new DogFollower({
 			scene: this,
 			texture: "lucky",
-			scale: 4,
-			followDistance: 30,
-			speed: 180,
-			isEnergetic: true,
-			side: "left",
+			...DOGS.lucky,
 		});
 		this.lucky.setPosition(360, 560);
 		this.lucky.setDepth(9);
@@ -95,11 +107,7 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		this.cooper = new DogFollower({
 			scene: this,
 			texture: "cooper",
-			scale: 4,
-			followDistance: 20,
-			speed: 130,
-			isEnergetic: false,
-			side: "right",
+			...DOGS.cooper,
 		});
 		this.cooper.setPosition(440, 565);
 		this.cooper.setDepth(9);
@@ -124,12 +132,6 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		this.theBoss.setDepth(5);
 		this.theBoss.setVisible(false);
 
-		// Office desks as decoration
-		this.add.sprite(150, 300, "desk").setScale(3).setDepth(2);
-		this.add.sprite(650, 300, "desk").setScale(3).setDepth(2);
-		this.add.sprite(150, 180, "desk").setScale(3).setDepth(2);
-		this.add.sprite(650, 180, "desk").setScale(3).setDepth(2);
-
 		// Enter dialogue
 		this.dialogueBox = new DialogueBox({ scene: this });
 		this.time.delayedCall(300, () => {
@@ -143,17 +145,20 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		this.phase = "postSenior";
 
 		// Pawn in middle of office
-		this.pawn = this.add.sprite(400, 250, "pawn").setScale(4);
-		this.pawn.setDepth(10);
+		this.pawn = this.add.sprite(400, 250, "pawn").setScale(PLAYER.SCALE);
+		this.pawn.setDepth(PLAYER.DEPTH);
+
+		// Player controller
+		this.playerController = new PlayerController({
+			scene: this,
+			sprite: this.pawn,
+			bounds: PLAYER_BOUNDS.office,
+		});
 
 		this.lucky = new DogFollower({
 			scene: this,
 			texture: "lucky",
-			scale: 4,
-			followDistance: 30,
-			speed: 180,
-			isEnergetic: true,
-			side: "left",
+			...DOGS.lucky,
 		});
 		this.lucky.setPosition(360, 260);
 		this.lucky.setDepth(9);
@@ -161,11 +166,7 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		this.cooper = new DogFollower({
 			scene: this,
 			texture: "cooper",
-			scale: 4,
-			followDistance: 20,
-			speed: 130,
-			isEnergetic: false,
-			side: "right",
+			...DOGS.cooper,
 		});
 		this.cooper.setPosition(440, 265);
 		this.cooper.setDepth(9);
@@ -180,10 +181,6 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		this.addNpcLabel(400, 68, "The Boss", 5);
 
 		this.npcsTriggered = { ploy: true, bestie: true, senior: true, boss: false };
-
-		// Desks
-		this.add.sprite(150, 300, "desk").setScale(3).setDepth(2);
-		this.add.sprite(650, 300, "desk").setScale(3).setDepth(2);
 
 		this.dialogueBox = new DialogueBox({ scene: this });
 		this.time.delayedCall(300, () => {
@@ -203,16 +200,151 @@ export class OfficeArrivalScene extends Phaser.Scene {
 					.setDepth(0);
 			}
 		}
-		// Walls at top
-		for (let x = 0; x < 50; x++) {
+
+		const g = this.add.graphics();
+		g.setDepth(1);
+
+		// Walls at top and left/right
+		g.fillStyle(0xd0d0d0);
+		g.fillRect(0, 0, 800, 35);
+		g.fillStyle(0xc0c0c0);
+		g.fillRect(0, 0, 10, 600);
+		g.fillRect(790, 0, 10, 600);
+
+		// Windows along top wall (high floor city view)
+		for (let i = 0; i < 8; i++) {
+			const wx = 30 + i * 95;
+			// Window frame
+			g.fillStyle(0x888888);
+			g.fillRect(wx - 2, 2, 74, 30);
+			// Sky view
+			g.fillStyle(0x87ceeb);
+			g.fillRect(wx, 4, 70, 26);
+			// City skyline silhouette
+			g.fillStyle(0x555555, 0.4);
+			// Random building heights in view
+			const heights = [18, 12, 22, 8, 16, 20, 10];
+			for (let b = 0; b < 7; b++) {
+				const bh = heights[b] ?? 12;
+				g.fillRect(wx + b * 10, 30 - bh, 8, bh);
+			}
+			// Clouds
+			g.fillStyle(0xffffff, 0.5);
+			g.fillRect(wx + 10, 8, 20, 5);
+			g.fillRect(wx + 40, 10, 15, 4);
+		}
+
+		// Windows along left wall
+		for (let i = 0; i < 4; i++) {
+			const wy = 80 + i * 120;
+			g.fillStyle(0x888888);
+			g.fillRect(0, wy - 2, 10, 64);
+			g.fillStyle(0x87ceeb);
+			g.fillRect(0, wy, 8, 60);
+			g.fillStyle(0x555555, 0.4);
+			g.fillRect(0, wy + 40, 8, 20);
+		}
+
+		// Desk pod clusters (open plan layout)
+		this.drawDeskPod(g, 100, 150, 3); // left pod, 3 desks
+		this.drawDeskPod(g, 500, 150, 3); // right pod, 3 desks
+		this.drawDeskPod(g, 100, 350, 2); // bottom left pod
+		this.drawDeskPod(g, 500, 350, 2); // bottom right pod
+
+		// Partition / low divider between pods
+		g.fillStyle(0xb0b0b0);
+		g.fillRect(360, 100, 4, 200);
+		g.fillStyle(0xaaaaaa);
+		g.fillRect(360, 105, 4, 5);
+		g.fillRect(360, 200, 4, 5);
+		g.fillRect(360, 290, 4, 5);
+
+		// Water cooler
+		g.fillStyle(0x6ab0d8);
+		g.fillRect(760, 200, 20, 30);
+		g.fillStyle(0xc0e0ff);
+		g.fillRect(763, 200, 14, 15);
+		g.fillStyle(0x666666);
+		g.fillRect(760, 230, 20, 5);
+		this.add
+			.text(770, 240, "Water", {
+				fontFamily: "monospace",
+				fontSize: "8px",
+				color: "#aaaaaa",
+			})
+			.setOrigin(0.5)
+			.setDepth(2);
+
+		// Printer/copier area
+		g.fillStyle(0x444444);
+		g.fillRect(750, 400, 35, 25);
+		g.fillStyle(0x333333);
+		g.fillRect(753, 403, 29, 10);
+		g.fillStyle(0xffffff);
+		g.fillRect(755, 415, 10, 5);
+		this.add
+			.text(768, 430, "Printer", {
+				fontFamily: "monospace",
+				fontSize: "8px",
+				color: "#aaaaaa",
+			})
+			.setOrigin(0.5)
+			.setDepth(2);
+
+		// Whiteboard on right wall
+		g.fillStyle(0xffffff);
+		g.fillRect(785, 100, 12, 80);
+		g.lineStyle(1, 0x888888);
+		g.strokeRect(785, 100, 12, 80);
+
+		// Potted plant near entrance
+		g.fillStyle(0x8b4513);
+		g.fillRect(30, 520, 20, 15);
+		g.fillStyle(0x228b22);
+		g.fillCircle(40, 510, 15);
+		g.fillStyle(0x2e8b57);
+		g.fillCircle(35, 505, 10);
+	}
+
+	private drawDeskPod(
+		g: Phaser.GameObjects.Graphics,
+		startX: number,
+		startY: number,
+		rows: number,
+	): void {
+		for (let r = 0; r < rows; r++) {
+			const dy = startY + r * 60;
+			// Left desk
+			g.fillStyle(0xc49a6c);
+			g.fillRect(startX, dy, 70, 25);
+			g.fillStyle(0xb08a5c);
+			g.fillRect(startX, dy + 23, 70, 2);
+			// Monitor on desk
+			g.fillStyle(0x333333);
+			g.fillRect(startX + 25, dy - 5, 20, 12);
+			g.fillStyle(0x6a9cc5);
+			g.fillRect(startX + 27, dy - 3, 16, 8);
+
+			// Right desk (facing the left one)
+			g.fillStyle(0xc49a6c);
+			g.fillRect(startX + 80, dy, 70, 25);
+			g.fillStyle(0xb08a5c);
+			g.fillRect(startX + 80, dy + 23, 70, 2);
+			// Monitor
+			g.fillStyle(0x333333);
+			g.fillRect(startX + 105, dy - 5, 20, 12);
+			g.fillStyle(0x6a9cc5);
+			g.fillRect(startX + 107, dy - 3, 16, 8);
+
+			// Chairs (using office chair sprites)
 			this.add
-				.sprite(x * 16, 0, "wallTile")
-				.setOrigin(0)
-				.setDepth(0);
+				.sprite(startX + 35, dy + 38, "officeChair")
+				.setScale(3)
+				.setDepth(1);
 			this.add
-				.sprite(x * 16, 16, "wallTile")
-				.setOrigin(0)
-				.setDepth(0);
+				.sprite(startX + 115, dy + 38, "officeChair")
+				.setScale(3)
+				.setDepth(1);
 		}
 	}
 
@@ -228,38 +360,19 @@ export class OfficeArrivalScene extends Phaser.Scene {
 			this.phase === "walkToBoss";
 
 		if (canMove) {
-			this.handleMovement(delta);
+			this.playerController.update(delta);
 			this.lucky.update(this.pawn.x, this.pawn.y, delta);
 			this.cooper.update(this.pawn.x, this.pawn.y, delta);
 			this.checkNPCProximity();
 		}
 	}
 
-	private handleMovement(delta: number): void {
-		const moveAmount = this.speed * (delta / 1000);
-
-		if (this.cursors.left.isDown) {
-			this.pawn.x -= moveAmount;
-			this.pawn.setFlipX(true);
-		} else if (this.cursors.right.isDown) {
-			this.pawn.x += moveAmount;
-			this.pawn.setFlipX(false);
-		}
-		if (this.cursors.up.isDown) {
-			this.pawn.y -= moveAmount;
-		} else if (this.cursors.down.isDown) {
-			this.pawn.y += moveAmount;
-		}
-
-		this.pawn.x = Phaser.Math.Clamp(this.pawn.x, 30, 770);
-		this.pawn.y = Phaser.Math.Clamp(this.pawn.y, 40, 570);
-	}
-
 	private checkNPCProximity(): void {
 		// Meet Ploy
 		if (
 			!this.npcsTriggered.ploy &&
-			Phaser.Math.Distance.Between(this.pawn.x, this.pawn.y, this.ploy.x, this.ploy.y) < 70
+			Phaser.Math.Distance.Between(this.pawn.x, this.pawn.y, this.ploy.x, this.ploy.y) <
+				INTERACTION.NPC_DISTANCE
 		) {
 			this.npcsTriggered.ploy = true;
 			this.dialogueBox.show(
@@ -274,7 +387,8 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		if (
 			this.npcsTriggered.ploy &&
 			!this.npcsTriggered.bestie &&
-			Phaser.Math.Distance.Between(this.pawn.x, this.pawn.y, this.bestie.x, this.bestie.y) < 70
+			Phaser.Math.Distance.Between(this.pawn.x, this.pawn.y, this.bestie.x, this.bestie.y) <
+				INTERACTION.NPC_DISTANCE
 		) {
 			this.npcsTriggered.bestie = true;
 			this.dialogueBox.show(
@@ -289,11 +403,12 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		if (
 			this.npcsTriggered.bestie &&
 			!this.npcsTriggered.senior &&
-			Phaser.Math.Distance.Between(this.pawn.x, this.pawn.y, this.mrSenior.x, this.mrSenior.y) < 80
+			Phaser.Math.Distance.Between(this.pawn.x, this.pawn.y, this.mrSenior.x, this.mrSenior.y) <
+				INTERACTION.SENIOR_DISTANCE
 		) {
 			this.npcsTriggered.senior = true;
 			this.dialogueBox.show(DIALOGUES.office.seniorApproach, () => {
-				this.cameras.main.fadeOut(300, 0, 0, 0);
+				this.cameras.main.fadeOut(FADE.FAST, 0, 0, 0);
 				this.cameras.main.once("camerafadeoutcomplete", () => {
 					this.scene.start("BattleScene", { battle: "mrSenior" });
 				});
@@ -304,10 +419,11 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		if (
 			this.npcsTriggered.senior &&
 			!this.npcsTriggered.boss &&
-			Phaser.Math.Distance.Between(this.pawn.x, this.pawn.y, this.theBoss.x, this.theBoss.y) < 80
+			Phaser.Math.Distance.Between(this.pawn.x, this.pawn.y, this.theBoss.x, this.theBoss.y) <
+				INTERACTION.BOSS_DISTANCE
 		) {
 			this.npcsTriggered.boss = true;
-			this.cameras.main.fadeOut(300, 0, 0, 0);
+			this.cameras.main.fadeOut(FADE.FAST, 0, 0, 0);
 			this.cameras.main.once("camerafadeoutcomplete", () => {
 				this.scene.start("BattleScene", { battle: "theBoss" });
 			});

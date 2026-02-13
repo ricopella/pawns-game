@@ -1,4 +1,5 @@
 import type Phaser from "phaser";
+import { DOG_FOLLOWER } from "../config/constants";
 
 interface DogFollowerConfig {
 	scene: Phaser.Scene;
@@ -30,7 +31,9 @@ export class DogFollower {
 		this.speed = config.speed;
 		this.isEnergetic = config.isEnergetic;
 		this.side = config.side;
-		this.historyDelay = config.isEnergetic ? 8 : 12;
+		this.historyDelay = config.isEnergetic
+			? DOG_FOLLOWER.ENERGETIC_HISTORY_DELAY
+			: DOG_FOLLOWER.CALM_HISTORY_DELAY;
 
 		// Name label above the dog
 		const name = config.texture === "lucky" ? "Lucky" : "Cooper";
@@ -63,16 +66,16 @@ export class DogFollower {
 		const delayedPos = this.positionHistory[0] ?? { x: targetX, y: targetY };
 
 		// Base offset: dogs walk beside Pawn, not behind
-		const sideOffset = this.side === "left" ? -45 : 45;
-		const yOffset = 5; // slightly behind but mostly beside
+		const sideOffset = this.side === "left" ? -DOG_FOLLOWER.SIDE_OFFSET : DOG_FOLLOWER.SIDE_OFFSET;
+		const yOffset = DOG_FOLLOWER.Y_OFFSET;
 
 		// Add wander offset for Lucky (energetic)
 		if (this.isEnergetic) {
 			this.wanderTimer += delta;
-			if (this.wanderTimer > 800) {
+			if (this.wanderTimer > DOG_FOLLOWER.WANDER_INTERVAL) {
 				this.wanderTimer = 0;
-				this.wanderOffsetX = (Math.random() - 0.5) * 30;
-				this.wanderOffsetY = (Math.random() - 0.5) * 20;
+				this.wanderOffsetX = (Math.random() - 0.5) * DOG_FOLLOWER.WANDER_X_RANGE;
+				this.wanderOffsetY = (Math.random() - 0.5) * DOG_FOLLOWER.WANDER_Y_RANGE;
 			}
 		}
 
@@ -83,7 +86,7 @@ export class DogFollower {
 		const dy = goalY - this.sprite.y;
 		const dist = Math.sqrt(dx * dx + dy * dy);
 
-		if (dist > 4) {
+		if (dist > DOG_FOLLOWER.MIN_MOVE_DIST) {
 			const moveSpeed = this.speed * (delta / 1000);
 			const ratio = Math.min(moveSpeed / dist, 1);
 			this.sprite.x += dx * ratio;
@@ -95,15 +98,17 @@ export class DogFollower {
 		this.nameLabel.setDepth(this.sprite.depth + 1);
 
 		// Flip sprite based on movement direction
-		if (dx < -2) {
+		if (dx < -DOG_FOLLOWER.FLIP_THRESHOLD) {
 			this.sprite.setFlipX(true);
-		} else if (dx > 2) {
+		} else if (dx > DOG_FOLLOWER.FLIP_THRESHOLD) {
 			this.sprite.setFlipX(false);
 		}
 
 		// Small bounce for energetic dog
 		if (this.isEnergetic) {
-			this.sprite.y += Math.sin(Date.now() / 150) * 0.8;
+			this.sprite.y +=
+				Math.sin(Date.now() / DOG_FOLLOWER.ENERGETIC_BOB_FREQUENCY) *
+				DOG_FOLLOWER.ENERGETIC_BOB_AMPLITUDE;
 		}
 	}
 

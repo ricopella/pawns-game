@@ -1,7 +1,10 @@
 import Phaser from "phaser";
+import { DOGS, FADE, INTERACTION, PLAYER, PLAYER_BOUNDS } from "../config/constants";
 import { DIALOGUES } from "../data/dialogues";
 import { DialogueBox } from "../systems/DialogueBox";
 import { DogFollower } from "../systems/DogFollower";
+import { createMusicToggle } from "../systems/MusicManager";
+import { PlayerController } from "../systems/PlayerController";
 
 type MorningPhase = "sleeping" | "wakeUp" | "freeWalk" | "feeding" | "fed" | "done";
 
@@ -11,13 +14,12 @@ export class MorningScene extends Phaser.Scene {
 	private lucky!: DogFollower;
 	private cooper!: DogFollower;
 	private dialogueBox!: DialogueBox;
-	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+	private playerController!: PlayerController;
 	private phase: MorningPhase = "sleeping";
 	private dogBowl1!: Phaser.GameObjects.Sprite;
 	private dogBowl2!: Phaser.GameObjects.Sprite;
 	private bowlZone!: Phaser.GameObjects.Zone;
 	private interactPrompt!: Phaser.GameObjects.Text;
-	private speed = 150;
 
 	constructor() {
 		super("MorningScene");
@@ -25,7 +27,8 @@ export class MorningScene extends Phaser.Scene {
 
 	create(): void {
 		this.phase = "sleeping";
-		this.cameras.main.fadeIn(500);
+		this.cameras.main.fadeIn(FADE.DEFAULT);
+		createMusicToggle(this);
 
 		// Draw bedroom
 		this.drawBedroom();
@@ -35,23 +38,19 @@ export class MorningScene extends Phaser.Scene {
 		bed.setDepth(1);
 
 		// Pawn sleeping on bed
-		this.pawnSleeping = this.add.sprite(570, 185, "pawnSleeping").setScale(4);
+		this.pawnSleeping = this.add.sprite(570, 185, "pawnSleeping").setScale(PLAYER.SCALE);
 		this.pawnSleeping.setDepth(2);
 
 		// Pawn (walking sprite, hidden initially)
-		this.pawn = this.add.sprite(550, 260, "pawn").setScale(4);
-		this.pawn.setDepth(5);
+		this.pawn = this.add.sprite(550, 260, "pawn").setScale(PLAYER.SCALE);
+		this.pawn.setDepth(PLAYER.DEPTH);
 		this.pawn.setVisible(false);
 
 		// Dogs on/near bed
 		this.lucky = new DogFollower({
 			scene: this,
 			texture: "lucky",
-			scale: 4,
-			followDistance: 30,
-			speed: 180,
-			isEnergetic: true,
-			side: "left",
+			...DOGS.lucky,
 		});
 		this.lucky.setPosition(590, 180);
 		this.lucky.setDepth(3);
@@ -59,11 +58,7 @@ export class MorningScene extends Phaser.Scene {
 		this.cooper = new DogFollower({
 			scene: this,
 			texture: "cooper",
-			scale: 4,
-			followDistance: 20,
-			speed: 130,
-			isEnergetic: false,
-			side: "right",
+			...DOGS.cooper,
 		});
 		this.cooper.setPosition(510, 200);
 		this.cooper.setDepth(3);
@@ -112,15 +107,28 @@ export class MorningScene extends Phaser.Scene {
 		// Dialogue box
 		this.dialogueBox = new DialogueBox({ scene: this });
 
-		// Controls
-		if (this.input.keyboard) {
-			this.cursors = this.input.keyboard.createCursorKeys();
-		}
+		// Player controller
+		this.playerController = new PlayerController({
+			scene: this,
+			sprite: this.pawn,
+			bounds: PLAYER_BOUNDS.morning,
+			enableBob: true,
+		});
+
+		// Scene cleanup
+		this.events.on("shutdown", this.cleanup, this);
 
 		// Start with wake-up dialogue
 		this.dialogueBox.show(DIALOGUES.morning.wakeUp, () => {
 			this.wakeUp();
 		});
+	}
+
+	private cleanup(): void {
+		this.lucky.destroy();
+		this.cooper.destroy();
+		this.dialogueBox.destroy();
+		this.events.off("shutdown", this.cleanup, this);
 	}
 
 	private drawBedroom(): void {
@@ -245,7 +253,7 @@ export class MorningScene extends Phaser.Scene {
 		if (this.dialogueBox.isActive()) return;
 
 		if (this.phase === "freeWalk") {
-			this.handleMovement(delta);
+			this.playerController.update(delta);
 			this.lucky.update(this.pawn.x, this.pawn.y, delta);
 			this.cooper.update(this.pawn.x, this.pawn.y, delta);
 
@@ -256,7 +264,7 @@ export class MorningScene extends Phaser.Scene {
 				this.bowlZone.x,
 				this.bowlZone.y,
 			);
-			if (dist < 80) {
+			if (dist < INTERACTION.BOWL_DISTANCE) {
 				this.interactPrompt.setVisible(true);
 				if (this.input.keyboard) {
 					const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -273,37 +281,6 @@ export class MorningScene extends Phaser.Scene {
 			this.lucky.update(this.pawn.x, this.pawn.y, delta);
 			this.cooper.update(this.pawn.x, this.pawn.y, delta);
 		}
-	}
-
-	private handleMovement(delta: number): void {
-		const moveAmount = this.speed * (delta / 1000);
-		let moved = false;
-
-		if (this.cursors.left.isDown) {
-			this.pawn.x -= moveAmount;
-			this.pawn.setFlipX(true);
-			moved = true;
-		} else if (this.cursors.right.isDown) {
-			this.pawn.x += moveAmount;
-			this.pawn.setFlipX(false);
-			moved = true;
-		}
-		if (this.cursors.up.isDown) {
-			this.pawn.y -= moveAmount;
-			moved = true;
-		} else if (this.cursors.down.isDown) {
-			this.pawn.y += moveAmount;
-			moved = true;
-		}
-
-		if (moved) {
-			// Simple bob animation
-			this.pawn.y += Math.sin(Date.now() / 100) * 0.5;
-		}
-
-		// Keep in bounds
-		this.pawn.x = Phaser.Math.Clamp(this.pawn.x, 30, 770);
-		this.pawn.y = Phaser.Math.Clamp(this.pawn.y, 90, 550);
 	}
 
 	private feedDogs(): void {
@@ -334,7 +311,7 @@ export class MorningScene extends Phaser.Scene {
 						this.phase = "fed";
 						this.dialogueBox.show(DIALOGUES.morning.feedDogs, () => {
 							this.dialogueBox.show(DIALOGUES.morning.timeToGo, () => {
-								this.cameras.main.fadeOut(500, 0, 0, 0);
+								this.cameras.main.fadeOut(FADE.DEFAULT, 0, 0, 0);
 								this.cameras.main.once("camerafadeoutcomplete", () => {
 									this.scene.start("LeaveHouseScene");
 								});

@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { BATTLE_UI } from "../config/constants";
 import type { BattleConfig, Move } from "../data/battleConfig";
 
 type BattlePhase =
@@ -67,60 +68,108 @@ export class BattleSystem {
 		bg.fillStyle(0x1a1a2e, 1);
 		bg.fillRect(0, 0, 800, 600);
 		bg.fillStyle(0x2a2a4e, 1);
-		bg.fillRect(0, 300, 800, 300);
+		bg.fillRect(0, BATTLE_UI.GROUND_LINE_Y, 800, 300);
 
 		// Ground line
 		bg.lineStyle(2, 0x444466);
-		bg.lineBetween(0, 300, 800, 300);
+		bg.lineBetween(0, BATTLE_UI.GROUND_LINE_Y, 800, BATTLE_UI.GROUND_LINE_Y);
 
 		// Player sprite (left side)
-		const playerSprite = scene.add.sprite(180, 260, "pawn").setScale(8);
+		const playerSprite = scene.add
+			.sprite(BATTLE_UI.PLAYER_X, BATTLE_UI.PLAYER_Y, "pawn")
+			.setScale(BATTLE_UI.PLAYER_SCALE);
 
 		// Cheering dogs
-		scene.add.sprite(100, 320, "lucky").setScale(4);
-		scene.add.sprite(260, 320, "cooper").setScale(4);
+		scene.add.sprite(BATTLE_UI.LUCKY_X, BATTLE_UI.LUCKY_Y, "lucky").setScale(BATTLE_UI.DOG_SCALE);
+		scene.add
+			.sprite(BATTLE_UI.COOPER_X, BATTLE_UI.COOPER_Y, "cooper")
+			.setScale(BATTLE_UI.DOG_SCALE);
 
 		// Enemy sprite (right side)
-		const enemySprite = scene.add.sprite(620, 180, this.config.enemyTexture).setScale(8);
+		const enemySprite = scene.add
+			.sprite(BATTLE_UI.ENEMY_X, BATTLE_UI.ENEMY_Y, this.config.enemyTexture)
+			.setScale(BATTLE_UI.ENEMY_SCALE);
 
 		// Player HP bar
-		const playerNameText = scene.add.text(30, 340, "Pawn", {
-			fontFamily: "monospace",
-			fontSize: "18px",
-			color: "#ffffff",
-		});
+		const playerNameText = scene.add.text(
+			BATTLE_UI.PLAYER_NAME_POS.x,
+			BATTLE_UI.PLAYER_NAME_POS.y,
+			"Pawn",
+			{
+				fontFamily: "monospace",
+				fontSize: "18px",
+				color: "#ffffff",
+			},
+		);
 
-		const playerHpText = scene.add.text(30, 365, `HP: ${this.playerHp}/${this.config.playerHp}`, {
-			fontFamily: "monospace",
-			fontSize: "14px",
-			color: "#aaaaaa",
-		});
+		const playerHpText = scene.add.text(
+			BATTLE_UI.PLAYER_HP_TEXT_POS.x,
+			BATTLE_UI.PLAYER_HP_TEXT_POS.y,
+			`HP: ${this.playerHp}/${this.config.playerHp}`,
+			{
+				fontFamily: "monospace",
+				fontSize: "14px",
+				color: "#aaaaaa",
+			},
+		);
 
 		const playerHpBar = scene.add.graphics();
-		this.drawHpBar(playerHpBar, 30, 385, this.playerHp, this.config.playerHp);
+		this.drawHpBar(
+			playerHpBar,
+			BATTLE_UI.PLAYER_HP_BAR.x,
+			BATTLE_UI.PLAYER_HP_BAR.y,
+			this.playerHp,
+			this.config.playerHp,
+		);
 
 		// Enemy HP bar
-		const enemyNameText = scene.add.text(520, 30, this.config.enemyName, {
-			fontFamily: "monospace",
-			fontSize: "18px",
-			color: "#ffffff",
-		});
+		const enemyNameText = scene.add.text(
+			BATTLE_UI.ENEMY_NAME_POS.x,
+			BATTLE_UI.ENEMY_NAME_POS.y,
+			this.config.enemyName,
+			{
+				fontFamily: "monospace",
+				fontSize: "18px",
+				color: "#ffffff",
+			},
+		);
 
-		const enemyHpText = scene.add.text(520, 55, `HP: ${this.enemyHp}/${this.config.enemyHp}`, {
-			fontFamily: "monospace",
-			fontSize: "14px",
-			color: "#aaaaaa",
-		});
+		const enemyHpText = scene.add.text(
+			BATTLE_UI.ENEMY_HP_TEXT_POS.x,
+			BATTLE_UI.ENEMY_HP_TEXT_POS.y,
+			`HP: ${this.enemyHp}/${this.config.enemyHp}`,
+			{
+				fontFamily: "monospace",
+				fontSize: "14px",
+				color: "#aaaaaa",
+			},
+		);
 
 		const enemyHpBar = scene.add.graphics();
-		this.drawHpBar(enemyHpBar, 520, 75, this.enemyHp, this.config.enemyHp);
+		this.drawHpBar(
+			enemyHpBar,
+			BATTLE_UI.ENEMY_HP_BAR.x,
+			BATTLE_UI.ENEMY_HP_BAR.y,
+			this.enemyHp,
+			this.config.enemyHp,
+		);
 
 		// Move menu
 		const menuBg = scene.add.graphics();
 		menuBg.fillStyle(0x1a1a2e, 0.95);
-		menuBg.fillRect(350, 420, 430, 160);
+		menuBg.fillRect(
+			BATTLE_UI.MENU.x,
+			BATTLE_UI.MENU.y,
+			BATTLE_UI.MENU.width,
+			BATTLE_UI.MENU.height,
+		);
 		menuBg.lineStyle(2, 0xff69b4);
-		menuBg.strokeRect(350, 420, 430, 160);
+		menuBg.strokeRect(
+			BATTLE_UI.MENU.x,
+			BATTLE_UI.MENU.y,
+			BATTLE_UI.MENU.width,
+			BATTLE_UI.MENU.height,
+		);
 
 		const moveTexts: Phaser.GameObjects.Text[] = [];
 		for (let i = 0; i < this.config.playerMoves.length; i++) {
@@ -128,11 +177,16 @@ export class BattleSystem {
 			if (!move) continue;
 			const col = i % 2;
 			const row = Math.floor(i / 2);
-			const text = scene.add.text(390 + col * 200, 440 + row * 50, move.name, {
-				fontFamily: "monospace",
-				fontSize: "18px",
-				color: "#ffffff",
-			});
+			const text = scene.add.text(
+				BATTLE_UI.MOVE_START_X + col * BATTLE_UI.MOVE_COL_OFFSET,
+				BATTLE_UI.MOVE_START_Y + row * BATTLE_UI.MOVE_ROW_OFFSET,
+				move.name,
+				{
+					fontFamily: "monospace",
+					fontSize: "18px",
+					color: "#ffffff",
+				},
+			);
 			moveTexts.push(text);
 		}
 
@@ -140,11 +194,11 @@ export class BattleSystem {
 		this.updateMoveSelector(moveSelector);
 
 		// Battle text
-		const battleText = scene.add.text(30, 440, "", {
+		const battleText = scene.add.text(BATTLE_UI.BATTLE_TEXT.x, BATTLE_UI.BATTLE_TEXT.y, "", {
 			fontFamily: "monospace",
 			fontSize: "18px",
 			color: "#ffffff",
-			wordWrap: { width: 300 },
+			wordWrap: { width: BATTLE_UI.BATTLE_TEXT.wrapWidth },
 			lineSpacing: 4,
 		});
 
@@ -175,15 +229,15 @@ export class BattleSystem {
 		g.clear();
 		// Background
 		g.fillStyle(0x333333);
-		g.fillRect(x, y, 200, 16);
+		g.fillRect(x, y, BATTLE_UI.HP_BAR_WIDTH, BATTLE_UI.HP_BAR_HEIGHT);
 		// Health
 		const ratio = Math.max(0, current / max);
 		const color = ratio > 0.5 ? 0x4caf50 : ratio > 0.25 ? 0xff9800 : 0xe74c3c;
 		g.fillStyle(color);
-		g.fillRect(x, y, 200 * ratio, 16);
+		g.fillRect(x, y, BATTLE_UI.HP_BAR_WIDTH * ratio, BATTLE_UI.HP_BAR_HEIGHT);
 		// Border
 		g.lineStyle(1, 0xffffff, 0.5);
-		g.strokeRect(x, y, 200, 16);
+		g.strokeRect(x, y, BATTLE_UI.HP_BAR_WIDTH, BATTLE_UI.HP_BAR_HEIGHT);
 	}
 
 	private updateMoveSelector(g?: Phaser.GameObjects.Graphics): void {
@@ -192,7 +246,12 @@ export class BattleSystem {
 		selector.lineStyle(2, 0xff69b4);
 		const col = this.selectedMove % 2;
 		const row = Math.floor(this.selectedMove / 2);
-		selector.strokeRect(380 + col * 200, 434 + row * 50, 180, 36);
+		selector.strokeRect(
+			BATTLE_UI.SELECTOR_X + col * BATTLE_UI.MOVE_COL_OFFSET,
+			BATTLE_UI.SELECTOR_Y + row * BATTLE_UI.MOVE_ROW_OFFSET,
+			BATTLE_UI.SELECTOR_WIDTH,
+			BATTLE_UI.SELECTOR_HEIGHT,
+		);
 	}
 
 	private setMoveMenuVisible(visible: boolean): void {

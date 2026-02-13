@@ -1,4 +1,6 @@
 import Phaser from "phaser";
+import { FADE } from "../config/constants";
+import { createMusicToggle, initMusic } from "../systems/MusicManager";
 
 export class TitleScene extends Phaser.Scene {
 	private canStart = false;
@@ -63,6 +65,10 @@ export class TitleScene extends Phaser.Scene {
 			repeat: -1,
 		});
 
+		// Initialize music system and add toggle button
+		initMusic();
+		createMusicToggle(this);
+
 		// Floating hearts
 		this.createFloatingHearts(width, height);
 
@@ -77,14 +83,19 @@ export class TitleScene extends Phaser.Scene {
 		});
 
 		// Delay before allowing start (prevent accidental skip)
-		this.time.delayedCall(500, () => {
+		this.time.delayedCall(FADE.DEFAULT, () => {
 			this.canStart = true;
+		});
+
+		// Scene cleanup
+		this.events.on("shutdown", () => {
+			this.input.keyboard?.removeAllListeners();
 		});
 
 		if (this.input.keyboard) {
 			this.input.keyboard.on("keydown-SPACE", () => {
 				if (this.canStart) {
-					this.cameras.main.fadeOut(500, 0, 0, 0);
+					this.cameras.main.fadeOut(FADE.DEFAULT, 0, 0, 0);
 					this.cameras.main.once("camerafadeoutcomplete", () => {
 						this.scene.start("MorningScene");
 					});
