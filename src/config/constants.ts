@@ -14,7 +14,7 @@ export const PLAYER = {
 
 export const PLAYER_BOUNDS = {
 	morning: { minX: 30, maxX: 770, minY: 90, maxY: 550 },
-	leaveHouse: { minX: 60, maxX: 770, minY: 260, maxY: 470 },
+	leaveHouse: { minX: 60, maxX: 770, minY: 220, maxY: 470 },
 	office: { minX: 30, maxX: 770, minY: 40, maxY: 570 },
 } as const;
 
@@ -79,10 +79,10 @@ export const DRIVING = {
 	TURN_AMPLITUDE: 30,
 	TURN_FREQUENCY: 1000,
 	SEGMENT_DISTANCES: {
-		straight1: 3000,
-		stoplight: 1000,
-		turnLeft: 2000,
-		straight2: 4000,
+		straight1: 2000,
+		stoplight: 800,
+		turnLeft: 1500,
+		straight2: 2500,
 		arrival: 500,
 	},
 	STOPLIGHT_MIN_WAIT: 2000,

@@ -1,7 +1,13 @@
 export const DIALOGUES = {
 	morning: {
-		wakeUp: ["Good morning, Pawn! Happy Valentine's Day!", "...but it's a work day. Ugh."],
-		dogsWake: ["Lucky is already bouncing around!", "Cooper yawns and stretches slowly..."],
+		wakeUp: [
+			"Good morning, Pawn! Happy Valentine's Day!",
+			"...it's Saturday, but you still have to go in to work. Ugh.",
+		],
+		dogsWake: [
+			"Cooper's already awake! He's barking at some noise outside.",
+			"Lucky doesn't want to get up... she wants to sleep 15 more minutes.",
+		],
 		feedDogs: ["Yum yum! Lucky and Cooper are so happy!"],
 		timeToGo: ["Alright, time to head to work!"],
 	},
@@ -21,18 +27,23 @@ export const DIALOGUES = {
 		enterBuilding: ["Another day at TTB Bank..."],
 		meetPloy: {
 			ploy: ["Hi Pawn! Happy Valentine's Day! 💕"],
-			pawn: ["Hi Ploy! Happy Valentine's Day to you too!"],
+			pawn: ["Hi Ploy! Happy Valentine's Day to you too!", "I'll see you later at the gym!"],
 		},
 		meetBestie: {
-			bestie: ["Hey Pawn! Did you bring lunch today?"],
-			pawn: ["Nope, let's order something later!"],
+			bestie: ["Hey Pawn! Did you bring food today?"],
+			pawn: [
+				"Yeah! It's beef pad kra pao with vegetables.",
+				"I made it myself last night!",
+			],
+			bestieReply: ["Let's see what kind of mood Mr. Boss is in today..."],
 		},
 		hallway: ["Walking through the office..."],
 		seniorApproach: ["Oh no... Mr. Senior is coming this way..."],
 		betweenBattles: [
 			"Mr. Senior retreated to his desk!",
 			"Phew! But wait...",
-			"The Boss walks over from his pod...",
+			"The Boss is moody again today...",
+			"He's calling you over to his pod...",
 		],
 	},
 	battle: {
@@ -42,12 +53,7 @@ export const DIALOGUES = {
 			defeat: ["Mr. Senior wore you down... Try again!"],
 		},
 		theBoss: {
-			intro: [
-				"The Boss appears!",
-				'"You need to hold your pee more!"',
-				'"You should stay late AND come in early!"',
-				'"Finish those proposals faster or I won\'t hit MY KPIs!"',
-			],
+			intro: ["The Boss looms over your desk..."],
 			victory: ["The Boss has been defeated! Pawn is FREE!"],
 			defeat: ["The Boss overwhelmed you... Try again!"],
 		},
@@ -58,7 +64,7 @@ export const DIALOGUES = {
 			"Happy Valentine's Day, Boo Boo!",
 			"I love you so much!",
 			"No matter how tough the day is...",
-			"I'll always be here waiting for you.",
+			"I'll always be there to support you.",
 			"You're the strongest, most amazing person I know.",
 			"Happy Valentine's Day, my Boo Boo. ❤️",
 		],

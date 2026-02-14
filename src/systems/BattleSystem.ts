@@ -65,14 +65,32 @@ export class BattleSystem {
 
 		// Battle background
 		const bg = scene.add.graphics();
-		bg.fillStyle(0x1a1a2e, 1);
+		const bgColor = this.config.bgColor ?? 0x1a1a2e;
+		const groundColor = this.config.groundColor ?? 0x2a2a4e;
+		const lineColor = this.config.lineColor ?? 0x444466;
+		bg.fillStyle(bgColor, 1);
 		bg.fillRect(0, 0, 800, 600);
-		bg.fillStyle(0x2a2a4e, 1);
+		bg.fillStyle(groundColor, 1);
 		bg.fillRect(0, BATTLE_UI.GROUND_LINE_Y, 800, 300);
 
 		// Ground line
-		bg.lineStyle(2, 0x444466);
+		bg.lineStyle(2, lineColor);
 		bg.lineBetween(0, BATTLE_UI.GROUND_LINE_Y, 800, BATTLE_UI.GROUND_LINE_Y);
+
+		// Scary red particles for boss fights
+		if (this.config.bgColor) {
+			for (let i = 0; i < 30; i++) {
+				const px = Math.random() * 800;
+				const py = Math.random() * BATTLE_UI.GROUND_LINE_Y;
+				bg.fillStyle(0xff2222, Math.random() * 0.15 + 0.05);
+				bg.fillCircle(px, py, Math.random() * 3 + 1);
+			}
+			// Red vignette edges
+			bg.fillStyle(0x440000, 0.3);
+			bg.fillRect(0, 0, 40, 600);
+			bg.fillRect(760, 0, 40, 600);
+			bg.fillRect(0, 0, 800, 20);
+		}
 
 		// Player sprite (left side)
 		const playerSprite = scene.add

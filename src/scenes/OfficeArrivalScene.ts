@@ -392,7 +392,11 @@ export class OfficeArrivalScene extends Phaser.Scene {
 		) {
 			this.npcsTriggered.bestie = true;
 			this.dialogueBox.show(
-				[...DIALOGUES.office.meetBestie.bestie, ...DIALOGUES.office.meetBestie.pawn],
+				[
+					...DIALOGUES.office.meetBestie.bestie,
+					...DIALOGUES.office.meetBestie.pawn,
+					...DIALOGUES.office.meetBestie.bestieReply,
+				],
 				() => {
 					this.phase = "walkHallway";
 				},

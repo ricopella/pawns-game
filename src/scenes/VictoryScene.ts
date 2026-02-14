@@ -245,7 +245,7 @@ export class VictoryScene extends Phaser.Scene {
 		});
 
 		// "Made with love" credit
-		const creditText = this.add.text(width / 2, 490, "Made with love for Boo Boo", {
+		const creditText = this.add.text(width / 2, 490, "Made with love from Boo Boo", {
 			fontFamily: "monospace",
 			fontSize: "16px",
 			color: "#ff99cc",

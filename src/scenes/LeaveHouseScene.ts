@@ -38,7 +38,7 @@ export class LeaveHouseScene extends Phaser.Scene {
 		this.car.setDepth(3);
 
 		// Pawn starts at building entrance
-		this.pawn = this.add.sprite(180, 280, "pawn").setScale(PLAYER.SCALE);
+		this.pawn = this.add.sprite(180, 235, "pawn").setScale(PLAYER.SCALE);
 		this.pawn.setDepth(PLAYER.DEPTH);
 
 		// Dogs
@@ -47,7 +47,7 @@ export class LeaveHouseScene extends Phaser.Scene {
 			texture: "lucky",
 			...DOGS.lucky,
 		});
-		this.lucky.setPosition(140, 290);
+		this.lucky.setPosition(140, 245);
 		this.lucky.setDepth(4);
 
 		this.cooper = new DogFollower({
@@ -55,7 +55,7 @@ export class LeaveHouseScene extends Phaser.Scene {
 			texture: "cooper",
 			...DOGS.cooper,
 		});
-		this.cooper.setPosition(220, 295);
+		this.cooper.setPosition(220, 250);
 		this.cooper.setDepth(4);
 
 		// Interact prompt near car
@@ -123,59 +123,59 @@ export class LeaveHouseScene extends Phaser.Scene {
 		const g = this.add.graphics();
 		g.setDepth(1);
 
-		// Main building (3 stories, left side)
+		// Main building (3 stories, left side - compact)
 		g.fillStyle(0xc9b8a0);
-		g.fillRect(50, 20, 280, 260);
+		g.fillRect(70, 30, 230, 190);
 		g.lineStyle(2, 0x8a7d6b);
-		g.strokeRect(50, 20, 280, 260);
+		g.strokeRect(70, 30, 230, 190);
 
 		// Floor dividers
 		g.lineStyle(1, 0xa09080);
-		g.lineBetween(50, 107, 330, 107);
-		g.lineBetween(50, 193, 330, 193);
+		g.lineBetween(70, 93, 300, 93);
+		g.lineBetween(70, 156, 300, 156);
 
 		// Windows - 3rd floor (Pawn's floor - pink curtain hint)
 		for (let i = 0; i < 4; i++) {
-			const wx = 70 + i * 65;
+			const wx = 85 + i * 55;
 			g.fillStyle(0x6a9cc5);
-			g.fillRect(wx, 40, 35, 45);
+			g.fillRect(wx, 42, 30, 38);
 			g.lineStyle(1, 0x888888);
-			g.lineBetween(wx + 17, 40, wx + 17, 85);
+			g.lineBetween(wx + 15, 42, wx + 15, 80);
 			if (i === 1) {
 				g.fillStyle(0xff69b4, 0.3);
-				g.fillRect(wx, 40, 12, 45);
+				g.fillRect(wx, 42, 10, 38);
 			}
 		}
 
 		// Windows - 2nd floor
 		for (let i = 0; i < 4; i++) {
-			const wx = 70 + i * 65;
+			const wx = 85 + i * 55;
 			g.fillStyle(0x6a9cc5);
-			g.fillRect(wx, 125, 35, 45);
+			g.fillRect(wx, 105, 30, 38);
 			g.lineStyle(1, 0x888888);
-			g.lineBetween(wx + 17, 125, wx + 17, 170);
+			g.lineBetween(wx + 15, 105, wx + 15, 143);
 		}
 
 		// Windows - 1st floor
 		for (let i = 0; i < 4; i++) {
-			const wx = 70 + i * 65;
+			const wx = 85 + i * 55;
 			g.fillStyle(0x6a9cc5);
-			g.fillRect(wx, 210, 35, 45);
+			g.fillRect(wx, 168, 30, 38);
 			g.lineStyle(1, 0x888888);
-			g.lineBetween(wx + 17, 210, wx + 17, 255);
+			g.lineBetween(wx + 15, 168, wx + 15, 206);
 		}
 
 		// Entrance / stairwell
 		g.fillStyle(0x5d4a3a);
-		g.fillRect(155, 235, 70, 45);
+		g.fillRect(150, 190, 60, 30);
 		g.fillStyle(0x8b5e3c);
-		g.fillRect(170, 245, 40, 35);
+		g.fillRect(162, 195, 36, 25);
 		g.fillStyle(0xffd700);
-		g.fillCircle(204, 262, 2);
+		g.fillCircle(192, 208, 2);
 
 		// Floor label
 		this.add
-			.text(190, 225, "3F", {
+			.text(180, 182, "3F", {
 				fontFamily: "monospace",
 				fontSize: "10px",
 				color: "#ffffff",
@@ -187,13 +187,13 @@ export class LeaveHouseScene extends Phaser.Scene {
 
 		// Roof railing
 		g.fillStyle(0x8a7d6b);
-		g.fillRect(48, 15, 284, 5);
+		g.fillRect(68, 25, 234, 5);
 
 		// Water tank on roof (very Bangkok)
 		g.fillStyle(0x606060);
-		g.fillRect(270, 0, 40, 15);
+		g.fillRect(250, 10, 35, 15);
 		g.fillStyle(0x555555);
-		g.fillRect(275, -5, 30, 5);
+		g.fillRect(255, 5, 25, 5);
 
 		// Power lines
 		g.lineStyle(1, 0x333333);
@@ -243,73 +243,84 @@ export class LeaveHouseScene extends Phaser.Scene {
 		const g = this.add.graphics();
 		g.setDepth(1);
 
-		// Food vendor stall (right side)
-		g.fillStyle(0xe87d2f);
+		// Coffee Shop stall (right side)
+		g.fillStyle(0x5c3317);
 		g.fillRect(450, 300, 80, 50);
-		g.fillStyle(0xffd700);
+		g.fillStyle(0x8b5e3c);
 		g.fillRect(455, 305, 70, 15);
-		g.fillStyle(0x8b4513);
+		g.fillStyle(0x3e2110);
 		g.fillRect(460, 320, 60, 25);
-		// Food dots
-		const foodColors = [0xff6347, 0xffd700, 0x90ee90, 0xff6347, 0xffd700];
-		for (let i = 0; i < foodColors.length; i++) {
-			g.fillStyle(foodColors[i] ?? 0xff6347);
-			g.fillCircle(470 + i * 10, 330, 3);
+		// Coffee cups
+		for (let i = 0; i < 4; i++) {
+			g.fillStyle(0xffffff);
+			g.fillRect(468 + i * 13, 325, 8, 12);
+			g.fillStyle(0x5c3317);
+			g.fillRect(470 + i * 13, 327, 4, 6);
 		}
 
 		this.add
-			.text(490, 290, "Som Tam", {
+			.text(490, 290, "Coffee Shop", {
 				fontFamily: "monospace",
 				fontSize: "9px",
-				color: "#ffff00",
+				color: "#ffd700",
 				stroke: "#000000",
 				strokeThickness: 2,
 			})
 			.setOrigin(0.5)
 			.setDepth(2);
 
-		// Drinks stall
-		g.fillStyle(0xc0392b);
+		// Weed Store
+		g.fillStyle(0x1a5c1a);
 		g.fillRect(580, 250, 70, 45);
-		g.fillStyle(0xff6b6b);
+		g.fillStyle(0x2d8b2d);
 		g.fillRect(585, 255, 60, 12);
-		g.fillStyle(0x8b4513);
+		g.fillStyle(0x145214);
 		g.fillRect(585, 267, 60, 23);
-		for (let i = 0; i < 5; i++) {
-			g.fillStyle(i % 2 === 0 ? 0x00bfff : 0xff69b4);
-			g.fillRect(590 + i * 10, 270, 6, 15);
+		// Leaf symbols
+		for (let i = 0; i < 3; i++) {
+			g.fillStyle(0x00cc00);
+			g.fillCircle(600 + i * 15, 278, 5);
+			g.fillStyle(0x009900);
+			g.fillCircle(600 + i * 15, 278, 3);
 		}
 
 		this.add
-			.text(615, 240, "Drinks", {
+			.text(615, 240, "Weed Store", {
 				fontFamily: "monospace",
 				fontSize: "9px",
-				color: "#00ffff",
+				color: "#00ff00",
 				stroke: "#000000",
 				strokeThickness: 2,
 			})
 			.setOrigin(0.5)
 			.setDepth(2);
 
-		// 7-Eleven
-		g.fillStyle(0x1a7742);
-		g.fillRect(400, 100, 120, 130);
-		g.fillStyle(0xff8c00);
-		g.fillRect(400, 100, 120, 20);
-		g.fillStyle(0x1a7742);
-		g.fillRect(410, 105, 100, 10);
+		// Union Mall
+		g.fillStyle(0xa08060);
+		g.fillRect(400, 80, 140, 150);
+		g.fillStyle(0xc49a6c);
+		g.fillRect(400, 80, 140, 25);
+		g.lineStyle(2, 0x8a7d6b);
+		g.strokeRect(400, 80, 140, 150);
+		// Shop windows
 		g.fillStyle(0xc0e0ff, 0.6);
-		g.fillRect(410, 130, 45, 60);
-		g.fillRect(465, 130, 45, 60);
+		g.fillRect(410, 115, 55, 50);
+		g.fillRect(475, 115, 55, 50);
+		// Entrance
 		g.fillStyle(0xc0e0ff, 0.8);
-		g.fillRect(445, 155, 30, 75);
+		g.fillRect(450, 175, 40, 55);
+		// Upper windows
+		g.fillStyle(0x6a9cc5);
+		for (let i = 0; i < 3; i++) {
+			g.fillRect(415 + i * 45, 170, 25, 20);
+		}
 
 		this.add
-			.text(460, 112, "7-ELEVEN", {
+			.text(470, 92, "Union Mall", {
 				fontFamily: "monospace",
-				fontSize: "10px",
+				fontSize: "11px",
 				color: "#ffffff",
-				stroke: "#1a7742",
+				stroke: "#5c3317",
 				strokeThickness: 2,
 			})
 			.setOrigin(0.5)
